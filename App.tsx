@@ -12,7 +12,7 @@ import { Home } from './src/screens/home';
 import { THEME } from './src/styles/theme';
 
 export default function App() {
-  const [fontsLoaded] = useFonts({Inter_400Regular, Inter_700Bold});
+  const [fontsLoaded] = useFonts({Inter_400Regular, Inter_700Bold, Inter_800ExtraBold});
 
   return (
     <NativeBaseProvider theme={THEME}>

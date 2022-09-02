@@ -29,7 +29,7 @@ export const THEME = extendTheme({
     lgg: 35,
   },
   fonts: {
-    heading: 'Inter_700Bold',
+    heading: 'Inter_800ExtraBold',
     body: 'Inter_400Regular',
   },
   sizes: {
