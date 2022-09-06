@@ -3,13 +3,48 @@ import { Input } from '../../components/Input';
 
 import { Heading, HStack, IconButton, Text, useTheme, VStack, FlatList, Center } from 'native-base';
 import { Rocket, PlusCircle} from 'phosphor-react-native';
+import { Alert } from 'react-native';
 
 export function Home() {
     const { colors } = useTheme();
-    const {assignment, setAssigment} = useState<string[]>([]);
+    const [assignments, setAssigments] = useState<typeof tarefas[]>([]);
+    const [tarefa, setTarefa] = useState('');
+    const [concluida, setConcluida] = useState(false);
+    const [criadas, setCriadas] = useState<number>(0);
+    const [concluidas, setConcluidas] = useState<number>(0);
+    
+   
+    const tarefas = {
+        tarefa,
+        concluida,
+    }
 
-    function handleAssigmentAdd(assignment: string){
+    function handleAssigmentAdd(){
+        //console.log(assignments)
+        if (!tarefa) {
+            return Alert.alert('Registrar','Preencha o campo');       
+        }
 
+        setAssigments(prevState =>  [...prevState, tarefas]);
+        setTarefa('');
+        
+        setCriadas(criadas+1);
+      
+    }
+
+    function handleAssigmentRemove(tarefa: string){
+        Alert.alert("Remover", `Remover o participante ${tarefa}?`,[
+            {
+              text: 'Sim',
+              onPress : () => setAssigments(prevState => prevState.filter(tarefas => tarefas !== tarefa))
+            },
+            {
+              text: 'Não',
+              style: 'cancel'
+            }
+          ])
+        
+        setCriadas(criadas-1);
     }
 
     return (
@@ -41,13 +76,18 @@ export function Home() {
                     ml="5"
                 >
                     <VStack w="85%" >
-                        <Input  placeholder='Adicione uma nova tarefa'></Input>
+                        <Input  
+                        placeholder='Adicione uma nova tarefa'
+                        onChangeText={setTarefa}
+                        value={tarefa}
+                        />
                     </VStack>
 
                     <VStack w="15%" ml="2" borderRadius={5} alignItems="center" bg="produto.blue_dark" justifyContent="center">
                         
                         <IconButton
-                            icon={ <PlusCircle size={26} color={colors.gray[100]}/>}
+                            icon={ <PlusCircle size={26} color={colors.gray[100]} />}
+                            onPress={handleAssigmentAdd}
                         />                  
                     </VStack>                                   
                 </HStack>
@@ -69,6 +109,10 @@ export function Home() {
 
             <VStack w="full" alignItems="center" justifyContent="center">
                 <Text color="colors.white">texto2</Text>
+                {assignments.forEach(tar => {
+                    console.log(tar.tarefa)
+                })
+                }
             </VStack>
            
         </VStack>
