@@ -17,9 +17,10 @@ export function Home() {
     
    
     const tarefas = {
-        tarefa,
-        concluida,
+        tarefa: tarefa,
+        concluida: false,
         handleAlterStatusTask,
+        handleTasksRemove,
     }
 
     function handleTasksAdd(){
@@ -36,10 +37,11 @@ export function Home() {
     }
 
     function handleTasksRemove(task: string){
-        Alert.alert("Remover", `Remover o participante ${tarefa}?`,[
+        console.log(task)
+        Alert.alert("Remover", `Remover a tarefa ${tarefa}?`,[
             {
               text: 'Sim',
-              onPress : () => setTasks(prevState => prevState.filter(tarefas => tarefas !== task))
+              onPress : () => setTasks(prevState => prevState.filter(tarefas => tarefas.tarefa !== task))
             },
             {
               text: 'Não',
@@ -50,11 +52,22 @@ export function Home() {
         setCriadas(criadas-1);
     }
 
-    function handleAlterStatusTask(task: string, status : Boolean){
-        console.log('entrou na funcao de alterar a task -- ', task);
+    function handleAlterStatusTask(task: string){
+        console.log('entrou na funcao de alterar a task -- ', task)
+        console.log(tasks.length)
+        console.log(tasks)
+        const taskIndex = tasks.findIndex((t) => {
+            return t.tarefa == task;
+        });
+        console.log('INDEX -- ', taskIndex.toString())
+        const tempTasks = tasks;
+        console.log({tempTasks}) 
+
+        //setTasks(tempTasks);
+        
     }
 
-    return (
+    return (  
         <VStack  flex={1} pb={6} bg="gray.600">
             <VStack 
                 alignItems="center" 
@@ -121,7 +134,8 @@ export function Home() {
                 { tasks.length > 0 ? tasks.map((tar, index) => (
                     <Text color="white">texto3</Text>   
                 )) : <Text color="white">lista vazia</Text>
-                } */}
+                } */
+                console.log(tasks)}
                 <FlatList
                     data={tasks}
                     renderItem={({item}) => <CardTasks {...item} /> }
