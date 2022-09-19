@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Input } from '../../components/Input';
 
-import { Heading, HStack, IconButton, Text, useTheme, VStack, FlatList, Center } from 'native-base';
+import { Input } from '../../components/Input';
+import { CardTasks } from '../../components/CardTasks';
+
+import { Heading, HStack, IconButton, Text, useTheme, VStack, Center } from 'native-base';
 import { Rocket, PlusCircle} from 'phosphor-react-native';
-import { Alert } from 'react-native';
+import { Alert, FlatList } from 'react-native';
 
 export function Home() {
     const { colors } = useTheme();
-    const [assignments, setAssigments] = useState<typeof tarefas[]>([]);
+    const [tasks, setTasks] = useState<typeof tarefas[]>([]);
     const [tarefa, setTarefa] = useState('');
     const [concluida, setConcluida] = useState(false);
     const [criadas, setCriadas] = useState<number>(0);
@@ -17,26 +19,27 @@ export function Home() {
     const tarefas = {
         tarefa,
         concluida,
+        handleAlterStatusTask,
     }
 
-    function handleAssigmentAdd(){
+    function handleTasksAdd(){
         //console.log(assignments)
         if (!tarefa) {
             return Alert.alert('Registrar','Preencha o campo');       
         }
 
-        setAssigments(prevState =>  [...prevState, tarefas]);
+        setTasks(prevState =>  [...prevState, tarefas]);
         setTarefa('');
         
         setCriadas(criadas+1);
       
     }
 
-    function handleAssigmentRemove(tarefa: string){
+    function handleTasksRemove(task: string){
         Alert.alert("Remover", `Remover o participante ${tarefa}?`,[
             {
               text: 'Sim',
-              onPress : () => setAssigments(prevState => prevState.filter(tarefas => tarefas !== tarefa))
+              onPress : () => setTasks(prevState => prevState.filter(tarefas => tarefas !== task))
             },
             {
               text: 'Não',
@@ -45,6 +48,10 @@ export function Home() {
           ])
         
         setCriadas(criadas-1);
+    }
+
+    function handleAlterStatusTask(task: string, status : Boolean){
+        console.log('entrou na funcao de alterar a task -- ', task);
     }
 
     return (
@@ -87,7 +94,7 @@ export function Home() {
                         
                         <IconButton
                             icon={ <PlusCircle size={26} color={colors.gray[100]} />}
-                            onPress={handleAssigmentAdd}
+                            onPress={handleTasksAdd}
                         />                  
                     </VStack>                                   
                 </HStack>
@@ -107,12 +114,19 @@ export function Home() {
                 </HStack>             
             </VStack>
 
-            <VStack w="full" alignItems="center" justifyContent="center">
-                <Text color="colors.white">texto2</Text>
-                {assignments.forEach(tar => {
-                    console.log(tar.tarefa)
-                })
-                }
+            <VStack alignItems="center">
+                {/* <Text color="white">texto3</Text>
+                <Text color="white">{tasks.length > 0 ? tasks[0].tarefa : 'vazio'}</Text>
+                {console.log('tamanho', tasks)}
+                { tasks.length > 0 ? tasks.map((tar, index) => (
+                    <Text color="white">texto3</Text>   
+                )) : <Text color="white">lista vazia</Text>
+                } */}
+                <FlatList
+                    data={tasks}
+                    renderItem={({item}) => <CardTasks {...item} /> }
+                    keyExtractor={(item) => item.tarefa}
+                /> 
             </VStack>
            
         </VStack>
