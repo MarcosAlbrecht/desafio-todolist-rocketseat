@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { Input } from '../../components/Input';
 import { CardTasks } from '../../components/CardTasks';
 
-import { Heading, HStack, IconButton, Text, useTheme, VStack, Center } from 'native-base';
-import { Rocket, PlusCircle} from 'phosphor-react-native';
-import { Alert, FlatList } from 'react-native';
+import { Heading, HStack, IconButton, Text, useTheme, VStack, FlatList, Checkbox } from 'native-base';
+import { Rocket, PlusCircle, Trash} from 'phosphor-react-native';
+import { Alert  } from 'react-native';
 
 export function Home() {
     const { colors } = useTheme();
@@ -14,13 +14,11 @@ export function Home() {
     const [concluida, setConcluida] = useState(false);
     const [criadas, setCriadas] = useState<number>(0);
     const [concluidas, setConcluidas] = useState<number>(0);
-    
+    const [taskIndex, setTaskIndex] = useState<typeof tarefas[]>([]);;
    
     const tarefas = {
         tarefa: tarefa,
         concluida: false,
-        handleAlterStatusTask,
-        handleTasksRemove,
     }
 
     function handleTasksAdd(){
@@ -35,9 +33,26 @@ export function Home() {
         setCriadas(criadas+1);
       
     }
+    function handleAlterTask(tas: string){
+       
+            //console.log(tas);    
+            //tasks.forEach(element => {
+            //    console.log(element.tarefa)    
+            //});
+            const taskIndex = tasks.map(object => object.tarefa).indexOf(tas);
+            console.log('index ',taskIndex) 
+            let newTasks = tasks;
+            newTasks[taskIndex].concluida = !newTasks[taskIndex].concluida;
+            setTasks(newTasks);
+            //console.log('index ', {taskIndex})
+            setTasks(prevState => prevState.filter(tarefas => tarefas.tarefa !== tas))       
+            
+
+    }
 
     function handleTasksRemove(task: string){
-        console.log(task)
+        
+    
         Alert.alert("Remover", `Remover a tarefa ${tarefa}?`,[
             {
               text: 'Sim',
@@ -49,22 +64,43 @@ export function Home() {
             }
           ])
         
-        setCriadas(criadas-1);
+            setCriadas(criadas-1);
+        
     }
 
-    function handleAlterStatusTask(task: string){
-        console.log('entrou na funcao de alterar a task -- ', task)
-        console.log(tasks.length)
-        console.log(tasks)
-        const taskIndex = tasks.findIndex((t) => {
-            return t.tarefa == task;
-        });
-        console.log('INDEX -- ', taskIndex.toString())
-        const tempTasks = tasks;
-        console.log({tempTasks}) 
-
-        //setTasks(tempTasks);
-        
+    function renderTasks(item: typeof tarefas) {
+        return (    
+            <VStack alignItems="center" justifyContent="center" bg="gray.400" h="90" w="full" pl={5} pr={5} mb={2} borderRadius={5} >
+              
+              <HStack >
+                <VStack w="10%" h="full" alignItems="center" justifyContent="center" >
+                <Checkbox accessibilityLabel='Input' bg="gray.400" 
+                    borderRadius={20} borderColor="produto.purple" 
+                    isChecked={item.concluida} size="lg" 
+                    colorScheme="purple"
+                    onChange={() => handleAlterTask(item.tarefa)}  />   
+                     
+         
+                </VStack>
+                <VStack w="80%" h="full" pl={5} justifyContent="center">
+                  {concluida ? <Text strikeThrough color="white" fontSize={18} fontWeight="" >{tarefa}</Text> :
+                    <Text color="white" fontSize={18} fontWeight="" >{item.tarefa}</Text>   
+                  }
+                  
+                </VStack>
+                <VStack w="10%" h="full" alignItems="center" justifyContent="center">
+                  <IconButton
+                    icon={ <Trash size={26} color={colors.gray[300]} />}
+                    onPress={() => handleTasksRemove(item.tarefa)}
+                  />   
+                </VStack>
+                
+                
+              </HStack>
+              
+               
+            </VStack>
+          );
     }
 
     return (  
@@ -135,11 +171,15 @@ export function Home() {
                     <Text color="white">texto3</Text>   
                 )) : <Text color="white">lista vazia</Text>
                 } */
-                console.log(tasks)}
+                console.log(tasks)
+                //console.log('taskIndex ',taskIndex)
+                }
                 <FlatList
                     data={tasks}
-                    renderItem={({item}) => <CardTasks {...item} /> }
+                    //renderItem={({item}) => renderTasks(item) }
+                    renderItem={({item}) => renderTasks(item) }
                     keyExtractor={(item) => item.tarefa}
+                    extraData={tasks}
                 /> 
             </VStack>
            
