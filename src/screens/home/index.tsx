@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { Input } from '../../components/Input';
 import { CardTasks } from '../../components/CardTasks';
 
-import { Heading, HStack, IconButton, Text, useTheme, VStack, FlatList, Checkbox } from 'native-base';
-import { Rocket, PlusCircle, Trash} from 'phosphor-react-native';
+import { Heading, HStack, IconButton, Text, useTheme, VStack, FlatList, ScrollView, View } from 'native-base';
+import { Rocket, PlusCircle, Trash, CheckCircle, Circle} from 'phosphor-react-native';
 import { Alert  } from 'react-native';
+import { background } from 'native-base/lib/typescript/theme/styled-system';
 
 export function Home() {
     const { colors } = useTheme();
@@ -33,30 +34,39 @@ export function Home() {
         setCriadas(criadas+1);
       
     }
-    function handleAlterTask(tas: string){
+    function handleAlterTask(task: string){
        
-            //console.log(tas);    
-            //tasks.forEach(element => {
-            //    console.log(element.tarefa)    
-            //});
-            const taskIndex = tasks.map(object => object.tarefa).indexOf(tas);
-            console.log('index ',taskIndex) 
-            let newTasks = tasks;
-            newTasks[taskIndex].concluida = !newTasks[taskIndex].concluida;
-            setTasks(newTasks);
-            //console.log('index ', {taskIndex})
-            setTasks(prevState => prevState.filter(tarefas => tarefas.tarefa !== tas))       
+        const taskIndex = tasks.findIndex(object => {
+            return object.tarefa === task;
+         });
+
+         console.log('index ',taskIndex) 
+         console.log('tasks ',tasks) 
+         const newToDoList = [...tasks];
+         newToDoList[taskIndex].concluida = !newToDoList[taskIndex].concluida;
+
+         if (newToDoList[taskIndex].concluida) {
+            setConcluidas(concluidas+1)   
+         }else
+            setConcluidas(concluidas-1)
+         setTasks(newToDoList);
+         console.log('tasks 2 ',tasks) 
+    
             
 
     }
 
-    function handleTasksRemove(task: string){
+    function handleTasksRemove(task: string, finalizada: Boolean){
         
-    
-        Alert.alert("Remover", `Remover a tarefa ${tarefa}?`,[
+        Alert.alert("Remover", `Remover a tarefa ${task}?`,[
             {
               text: 'Sim',
-              onPress : () => setTasks(prevState => prevState.filter(tarefas => tarefas.tarefa !== task))
+              onPress : () => {setTasks(prevState => prevState.filter(tarefas => tarefas.tarefa !== task));
+                setCriadas(criadas-1);
+                if (finalizada) {
+                    setConcluidas(concluidas-1)    
+                }     
+            }
             },
             {
               text: 'Não',
@@ -64,26 +74,31 @@ export function Home() {
             }
           ])
         
-            setCriadas(criadas-1);
+    
         
     }
 
     function renderTasks(item: typeof tarefas) {
         return (    
-            <VStack alignItems="center" justifyContent="center" bg="gray.400" h="90" w="full" pl={5} pr={5} mb={2} borderRadius={5} >
+            <VStack alignItems="center" justifyContent="center" bg="gray.400" h="90" pl={5} pr={5} mb={2}  mr={4} ml={4} borderRadius={5} >
               
               <HStack >
                 <VStack w="10%" h="full" alignItems="center" justifyContent="center" >
-                <Checkbox accessibilityLabel='Input' bg="gray.400" 
-                    borderRadius={20} borderColor="produto.purple" 
-                    isChecked={item.concluida} size="lg" 
-                    colorScheme="purple"
-                    onChange={() => handleAlterTask(item.tarefa)}  />   
-                     
-         
+                {
+                 item.concluida ?    
+                <IconButton
+                    icon={ <CheckCircle size={26} color="#5E60CE" />}
+                    onPress={() => handleAlterTask(item.tarefa)}
+                  />   
+                  :
+                  <IconButton
+                  icon={ <Circle size={26} color={colors.gray[300]} />}
+                  onPress={() => handleAlterTask(item.tarefa)}
+                />     
+                }
                 </VStack>
                 <VStack w="80%" h="full" pl={5} justifyContent="center">
-                  {concluida ? <Text strikeThrough color="white" fontSize={18} fontWeight="" >{tarefa}</Text> :
+                  {item.concluida ? <Text strikeThrough color="white" fontSize={18} >{item.tarefa}</Text> :
                     <Text color="white" fontSize={18} fontWeight="" >{item.tarefa}</Text>   
                   }
                   
@@ -91,7 +106,7 @@ export function Home() {
                 <VStack w="10%" h="full" alignItems="center" justifyContent="center">
                   <IconButton
                     icon={ <Trash size={26} color={colors.gray[300]} />}
-                    onPress={() => handleTasksRemove(item.tarefa)}
+                    onPress={() => handleTasksRemove(item.tarefa, item.concluida)}
                   />   
                 </VStack>
                 
@@ -103,8 +118,9 @@ export function Home() {
           );
     }
 
-    return (  
-        <VStack  flex={1} pb={6} bg="gray.600">
+    return ( 
+        <View>
+        <View h="full"  bg="gray.600">
             <VStack 
                 alignItems="center" 
                 bg="gray.700" 
@@ -153,36 +169,32 @@ export function Home() {
                 <HStack justifyContent="space-between" pb="5" borderBottomWidth={1} borderBottomColor="gray.400">
                     <HStack justifyContent="space-between" alignItems="center">
                         <Text color="produto.blue" fontSize="md" fontStyle="body" fontWeight="bold">Criadas </Text>
-                        <Text bg="gray.400" pl="2" pr="2" borderRadius={15} color="white" fontStyle="body" fontWeight="bold">2</Text>    
+                        <Text bg="gray.400" pl="2" pr="2" borderRadius={15} color="white" fontStyle="body" fontWeight="bold">{criadas}</Text>    
                     </HStack> 
                     <HStack justifyContent="space-between" alignItems="center">
                         <Text color="produto.purple" fontSize="md" fontStyle="body" fontWeight="bold">Concluídas </Text>
-                        <Text bg="gray.400" pl="2" pr="2" borderRadius={15} color="white" fontStyle="body" fontWeight="bold">5</Text>    
+                        <Text bg="gray.400" pl="2" pr="2" borderRadius={15} color="white" fontStyle="body" fontWeight="bold">{concluidas}</Text>    
                     </HStack>    
                     
                 </HStack>             
             </VStack>
 
-            <VStack alignItems="center">
-                {/* <Text color="white">texto3</Text>
-                <Text color="white">{tasks.length > 0 ? tasks[0].tarefa : 'vazio'}</Text>
-                {console.log('tamanho', tasks)}
-                { tasks.length > 0 ? tasks.map((tar, index) => (
-                    <Text color="white">texto3</Text>   
-                )) : <Text color="white">lista vazia</Text>
-                } */
-                console.log(tasks)
-                //console.log('taskIndex ',taskIndex)
-                }
+            <ScrollView >
+                
                 <FlatList
                     data={tasks}
                     //renderItem={({item}) => renderTasks(item) }
                     renderItem={({item}) => renderTasks(item) }
                     keyExtractor={(item) => item.tarefa}
                     extraData={tasks}
+                    contentContainerStyle={{
+                        flexGrow: 1,
+                    }}
+                    showsHorizontalScrollIndicator={true}
                 /> 
-            </VStack>
+            </ScrollView>
            
-        </VStack>
+        </View>
+        </View> 
     );
 }
